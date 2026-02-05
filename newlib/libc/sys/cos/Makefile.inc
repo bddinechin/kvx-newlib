@@ -1,0 +1,1 @@
+libc_a_SOURCES += %D%/lock.c %D%/secure_getenv.c %D%/setgethostname.c %D%/getrusage.c %D%/basedirname.c %D%/timespec_get.c %D%/net/inet_ntop.c %D%/net/inet_pton.c %D%/net/inet_aton.c %D%/net/inet_addr.c %D%/clock_gettime.c %D%/clock_getres.c %D%/sleep.c %D%/nanosleep.c %D%/usleep.c

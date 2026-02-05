@@ -1,0 +1,107 @@
+DESTDIR =
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+top_srcdir = @top_srcdir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+program_transform_name = @program_transform_name@
+
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+MULTIDO = true
+MULTICLEAN = true
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+SHELL =	/bin/sh
+
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
+CC = @CC@
+
+#AS = @AS@
+AS = `if [ -f ${objroot}/../gas/as.new ] ; \
+	then echo ${objroot}/../gas/as.new ; \
+	else echo as ; fi`
+
+AR = @AR@
+
+#LD = @LD@
+LD = `if [ -f ${objroot}/../ld/ld.new ] ; \
+	then echo ${objroot}/../ld/ld.new ; \
+	else echo ld ; fi`
+
+RANLIB = @RANLIB@
+
+OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
+	then echo ${objroot}/../binutils/objdump ; \
+	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
+OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
+	then echo ${objroot}/../binutils/objcopy ; \
+	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
+
+#GLOSS_OBJS = start.o boot_c.o cpu.o idle.o mp.o interrupt.o apec_config.o io.o \
+#	     bsp.o exceptions.o handlers.o syscall.o context.o \
+#	     diagnostic.o boot_args.o apic_gic.o apic_mailbox.o \
+#	     l2_cache.o power.o cache.o
+
+GLOSS_OBJS =
+
+SYS_OBJS = access.o chdir.o chmod.o close.o dup.o dup2.o  exit.o fcntl.o \
+	fstat.o getpagesize.o gettimeofday.o isatty.o link.o lseek.o \
+	mkdir.o open.o read.o rmdir.o sbrk.o stat.o unlink.o write.o \
+	asm_syscalls.o mkfifo.o nanosleep.o times.o sleep.o usleep.o
+
+ENOSYS_STUB_OBJS = execve.o fork.o kill.o getpid.o wait.o
+
+CRT_FILES = crt0.o
+
+# Host specific makefile fragment comes in here.
+@host_makefile_frag@
+
+INCLUDES += -I$(srcdir)/include
+
+all: libgloss.a $(CRT_FILES)
+
+libgloss.a: $(GLOSS_OBJS) $(SYS_OBJS) $(ENOSYS_STUB_OBJS)
+	${AR} ${ARFLAGS} $@ $(GLOSS_OBJS) $(SYS_OBJS) $(ENOSYS_STUB_OBJS)
+	${RANLIB} $@
+
+doc:
+
+clean mostlyclean:
+	rm -f a.out core *.i *~ *.o *-test *.srec *.dis *.map *.x
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile a.out
+
+.PHONY: install info install-info clean-info
+install:
+	$(INSTALL_PROGRAM) libgloss.a $(DESTDIR)$(tooldir)/lib${MULTISUBDIR};
+	$(INSTALL_PROGRAM) $(CRT_FILES) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR};
+	${mkinstalldirs} ${DESTDIR}${tooldir}/include/kvx;
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib;
+	for i in ${srcdir}/linker_scripts/*.ld; do \
+	  ${INSTALL_DATA} $$i ${DESTDIR}${tooldir}/lib/`basename $$i`; \
+	done
+
+info:
+install-info:
+clean-info:
+
+Makefile: Makefile.in @host_makefile_frag_path@

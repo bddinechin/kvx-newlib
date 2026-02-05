@@ -1,0 +1,12 @@
+Let consider toolchain path is in KALRAY_TOOLCHAIN_DIR variable (i.e. /usr/local/k1rdtools)
+
+To build newlib for elf toolchain (bare):
+./build-newlib.sh --toolroot ${KALRAY_TOOLCHAIN_DIR}
+
+By default, it will build in ./build/build-newlib and install in devimage/toolchain-k1-elf/k1-elf
+
+To compile and link hello.c with this newlib:
+${KALRAY_TOOLCHAIN_DIR}/bin/k1-elf-gcc -o hello.u ../hello.c -nostdinc -nostdlib -isystem ./devimage/toolchain-k1-elf/k1-elf/include -isystem ${KALRAY_TOOLCHAIN_DIR}/bin/../lib/gcc/k1-elf/7.4.1/include -L./devimage/toolchain-k1-elf/k1-elf/lib ./devimage/toolchain-k1-elf/k1-elf/lib/crt0.o -lc -lgloss -lc -lgloss -lgcc -Tbare.ld
+
+To execute this binary:
+${yKALRAY_TOOLCHAIN_DIR}/bin/k1-mppa -- ./hello.u

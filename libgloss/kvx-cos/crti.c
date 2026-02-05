@@ -1,0 +1,21 @@
+asm(    "       .section .init      \n"
+        "       .globl _init        \n"
+        "       .align 8            \n"
+        "_init:                     \n"
+        "       get $r0 = $ra       \n"
+        "       add $r12 = $r12, -32 \n"
+        "        ;;                 \n"
+        "        sw 16[$r12] = $r0  \n"
+        "        ;;                 \n"
+        "       .previous           \n");
+
+asm(    "       .section .fini      \n"
+        "       .globl _fini        \n"
+        "       .align 8            \n"
+        "_fini:                     \n"
+        "       get $r0 = $ra       \n"
+        "       add $r12 = $r12, -32 \n"
+        "       ;;                  \n"
+        "       sw 16[$r12] = $r0   \n"
+        "       ;;                  \n"
+        "       .previous           \n");
